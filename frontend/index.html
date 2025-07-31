@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatCluster</title>
+    <link rel="stylesheet" href="./style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <span class="toast-icon"></span>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- Authentication Container -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-form">
+            <div class="auth-logo">
+                <i class="fab fa-whatsapp"></i>
+                <h1>Chat Cluster</h1>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+                <button class="auth-tab" data-tab="register">
+                    <i class="fas fa-user-plus"></i>
+                    Register
+                </button>
+            </div>
+            
+            <div id="errorMessage" class="message-alert error" style="display: none;"></div>
+            <div id="successMessage" class="message-alert success" style="display: none;"></div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="form-container">
+                <h2>Welcome Back</h2>
+                <p class="form-subtitle">Sign in to continue chatting</p>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <div class="input-container">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="loginEmail" class="form-input" placeholder="Email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-container">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="loginPassword" class="form-input" placeholder="Password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-button" id="loginButton">
+                        <span class="button-text">Sign In</span>
+                        <i class="fas fa-arrow-right button-icon"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="form-container" style="display: none;">
+                <h2>Create Account</h2>
+                <p class="form-subtitle">Join the conversation</p>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <div class="input-container">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="registerUsername" class="form-input" placeholder="Username" required minlength="3" maxlength="20">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-container">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="registerEmail" class="form-input" placeholder="Email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-container">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="registerPassword" class="form-input" placeholder="Password (min 6 chars)" required minlength="6">
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-button" id="registerButton">
+                        <span class="button-text">Create Account</span>
+                        <i class="fas fa-user-plus button-icon"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="app-container">
+        <header class="app-header">
+            <div class="app-title">
+                <i class="fab fa-whatsapp"></i>
+                <span>Chat Cluster</span>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div class="user-details">
+                        <span id="username" class="user-name"></span>
+                        <div class="online-indicator">
+                            <span class="status-dot"></span>
+                            Online
+                        </div>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search friends...">
+                        <button class="search-clear" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar-actions">
+                        <button id="addFriendBtn" class="action-btn primary">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Friend</span>
+                        </button>
+                        <button id="viewRequestsBtn" class="action-btn secondary">
+                            <i class="fas fa-bell"></i>
+                            <span>Requests</span>
+                            <div class="notification-badge" id="requestsBadge" style="display: none;">0</div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friends-section">
+                    <div class="section-header">
+                        <h3>
+                            <i class="fas fa-users"></i>
+                            Friends
+                        </h3>
+                        <span class="friends-count" id="friendsCount">0</span>
+                    </div>
+                    <div id="friendsList" class="friends-list">
+                        <div class="empty-state">
+                            <i class="fas fa-user-friends"></i>
+                            <h3>No friends yet</h3>
+                            <p>Add some friends to start chatting!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div id="noChatSelected" class="no-chat-selected">
+                    <div class="no-chat-content">
+                        <i class="fas fa-comments"></i>
+                        <h2>Welcome to Chat Cluster</h2>
+                        <p>Select a friend to start chatting</p>
+                    </div>
+                </div>
+                
+                <div id="chatInterface" class="chat-interface">
+                    <div class="chat-header">
+                        <div class="chat-user-info">
+                            <img id="chatUserAvatar" class="chat-user-avatar" src="" alt="User">
+                            <div class="chat-user-details">
+                                <h3 id="chatUsername"></h3>
+                                <div class="chat-status">
+                                    <span class="status-indicator" id="chatStatusIndicator"></span>
+                                    <span id="chatUserStatus">Offline</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="chat-action-btn" title="Video Call">
+                                <i class="fas fa-video"></i>
+                            </button>
+                            <button class="chat-action-btn" title="Voice Call">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="chat-action-btn" title="More Options">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="messages-container" id="messagesContainer">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    
+                    <div class="input-area">
+                        <div class="input-container">
+                            <button class="input-action-btn" title="Attach">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                            <button class="input-action-btn emoji-btn" title="Emoji">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <button id="sendButton" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Friend Modal -->
+    <div id="addFriendModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-user-plus"></i>
+                    Add Friend
+                </h3>
+                <button class="close-btn" id="closeAddFriendModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="userSearchInput" class="search-input" placeholder="Search by username or email...">
+                    <button id="searchUsersBtn" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div id="searchResults" class="search-results">
+                    <div class="empty-search">
+                        <i class="fas fa-search"></i>
+                        <p>Search for users to add as friends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friend Requests Modal -->
+    <div id="friendRequestsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-bell"></i>
+                    Friend Requests
+                </h3>
+                <button class="close-btn" id="closeFriendRequestsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="friendRequestsList" class="friend-requests-list">
+                    <!-- Friend requests will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- here -->
+    <script src="socket.io/socket.io.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/socket.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/friends.js"></script>
+    <script src="./js/chat.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
