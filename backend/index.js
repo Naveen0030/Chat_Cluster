@@ -14,12 +14,12 @@ require('dotenv').config();
 const app = express();
 app.set('trust proxy', 1);
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || "*",
-    methods: ["GET", "POST"]
-  }
-});
+// const io = socketIo(server, {
+//   cors: {
+//     origin: process.env.CLIENT_URL || "*",
+//     methods: ["GET", "POST"]
+//   }
+// });
 
 app.use(helmet({
   contentSecurityPolicy: {
