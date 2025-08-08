@@ -21,33 +21,68 @@ const io = socketIo(server, {
   }
 });
 
-// Middleware
 app.use(helmet({
   contentSecurityPolicy: {
+    useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https://ui-avatars.com"]
-    }
-  }
-}));
-
-app.use(cors({
-  origin: function (origin, callback) { // here
-    if (!origin || origin.startsWith("https://chat-cluster-nx7s.vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS: " + origin));
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "data:", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https://ui-avatars.com"],
+      connectSrc: [
+        "'self'",
+        "https://chat-cluster.onrender.com",
+        "wss://chat-cluster.onrender.com",
+        "https://chat-cluster-nx7s.vercel.app",
+        "wss://chat-cluster-nx7s.vercel.app",
+        "http://localhost:3000",
+        "ws://localhost:3000",
+        "http://localhost:5173",
+        "ws://localhost:5173"
+      ],
+      upgradeInsecureRequests: null
     }
   },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
+const allowedOrigins = (process.env.CLIENT_URLS || [
+  'https://chat-cluster-nx7s.vercel.app',
+  'https://chat-cluster.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173'
+]).map(s => s.trim());
 
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+
+    const ok = allowedOrigins.some(o => origin === o || origin.startsWith(o));
+    if (ok) return callback(null, true);
+
+    return callback(new Error('Not allowed by CORS: ' + origin));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); 
+const io = socketIo(server, {
+  cors: {
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const ok = allowedOrigins.some(o => origin === o || origin.startsWith(o));
+      cb(ok ? null : 'Not allowed by CORS: ' + origin, ok);
+    },
+    methods: ['GET','POST'],
+    credentials: true
+  }
+});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../frontend')));
