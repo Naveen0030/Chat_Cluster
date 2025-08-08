@@ -1,5 +1,5 @@
 // Global configuration
-window.API_BASE = "http://localhost:3000";
+window.API_BASE = "https://chat-cluster.vercel.app";
 const API_BASE = window.API_BASE;
 const apiUrl = `${API_BASE}/api`;
 
