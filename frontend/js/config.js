@@ -1,5 +1,5 @@
 // Global configuration
-window.API_BASE = "https://chat-cluster.vercel.app";
+window.API_BASE = "https://chat-cluster.onrender.com";
 const API_BASE = window.API_BASE;
 const apiUrl = `${API_BASE}/api`;
 
