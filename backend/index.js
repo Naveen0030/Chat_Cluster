@@ -35,7 +35,7 @@ app.use(helmet({
 
 app.use(cors({
   origin: function (origin, callback) { // here
-    if (!origin || origin.startsWith("http://localhost:3000")) {
+    if (!origin || origin.startsWith("https://chat-cluster-nx7s.vercel.app")) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS: " + origin));
