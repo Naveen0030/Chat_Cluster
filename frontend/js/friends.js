@@ -150,7 +150,7 @@ function renderFriendList(friends) {
                 <div class="friend-status">${statusText}</div>
             </div>
             <div class="friend-meta">
-                <div class="last-message-time">12:30</div>
+                <div class="last-message-time"></div>
                 <div class="unread-count" style="display: none;">2</div>
             </div>
         `;
